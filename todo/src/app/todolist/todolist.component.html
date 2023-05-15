@@ -1,0 +1,42 @@
+<div class="container">
+    <h1 class="text-center display-4 mt-5">Etec - Lista de Tarefas</h1>
+    <hr>
+    <form (ngSubmit)="onSubmit(taskForm)" #taskForm="ngForm" class="col-md-6 offset-md-3">
+        <div class="mb-4">
+            <label for="task" class="form-label">Tarefa</label>
+            <input type="text" class="form-control" id="task" placeholder="Digite a tarefa a ser realizada" ngModel
+                name="task" required>
+            <small *ngIf="taskForm.invalid && taskForm.dirty" class="text-danger">Campo Obrigatório.</small>
+        </div>
+        <button [disabled]="taskForm.invalid" type="submit" class="btn btn-primary">Adicionar Tarefa</button>
+    </form>
+
+    <hr>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Tarefa</th>
+                <th scope="col">Status</th>
+                <th scope="col">Excluir</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngIf="taskArray.length == 0;else elseBlock">
+                <th colspan="4">
+                    <h4 class="text-center">Adicione as tarefas a realizar</h4>
+                </th>
+            </tr>
+            <ng-template #elseBlock>
+                <tr *ngFor="let task of taskArray; index as i">
+                    <th scope="row">{{i+1}}</th>
+                    <td>{{task.taskName}}</td>
+                    <td><input (change)="onCheck(i)" type="checkbox"> Finalizada</td>
+                    <td><button class="btn btn-danger btn-sm" (click)="onDelete(i)">Excluir</button></td>
+                </tr>
+            </ng-template>
+        </tbody>
+    </table>
+
+</div>

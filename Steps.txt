@@ -1,0 +1,232 @@
+Criar repositório
+
+
+Clonar repositório
+
+
+Abrir o repositório no VSCode
+
+
+No terminal:
+	ng new todo
+	routing Y
+	CSS [Enter]
+
+
+Para executar no terminal:
+	cd todo
+	ng serve -o
+	
+	
+Para para Ctrl+C
+
+
+Criar o componente da Lista de Tarefas, no terminal:
+	ng g c todo-list    // que é o mesmo que ng generate component todo-list
+
+
+Abrir o arquivo app.component.html e apagar todo o código, escrevendo no lugar
+	<app-todolist></app-todolist>
+
+
+Executar novamente para ver como ficou
+
+
+Abrir o site do bootstrap:
+	https://getbootstrap.com
+
+
+Clicar em Docs e no input de pesquisa (Search) procurar por Forms
+
+
+Copiar o primeiro exemplo e colar substituindo o atual conteudo do arquivo todolist.component.html
+
+
+Executar novamente para ver como ficou
+
+
+Agora para a execução e vamos instalar o bootstrap, no terminal dentro da pasta do projeto execute:
+	npm install bootstrap
+
+
+Executar novamente para ver como ficou e nada mudou
+
+
+Vamos colocar o bootstrap em uso, abra o arquivo angular.json e no vetor "styles" vamos adicionar a linha do bootstrap, conforme abaixo:
+	"style": [
+		"node_modules/bootstrap/dist/css/bootstrap.min.css",
+		"src/styles.css"
+	]
+
+
+Para o projeto e execute novamente, ficou bonitão
+
+
+Agora vamos editar o código do arquivo todolist.component.html
+
+<div class="container">
+    <h1 class="text-center display-4 mt-5">Etec - Lista de Tarefas</h1>
+    <hr>
+    <form class="col-md-6 offset-md-3">
+        <div class="mb-4">
+            <label for="task" class="form-label">Tarefa</label>
+            <input type="text" class="form-control" id="task" placeholder="Digite a tarefa a ser realizada">
+            <div id="task" class="form-text text-danger">Campo Obrigatório.</div>
+        </div>
+        <button type="submit" class="btn btn-primary">Adicionar Tarefa</button>
+    </form>
+
+    <hr>
+	
+	**************
+	
+</div>
+
+
+Volte ao site do bootstrap e pesquise Table e copie do primeiro exemplo, colando no todolist.component.html, abaixo do último <hr> no lugar do **********
+
+
+Altere o código html da table conforme abaixo
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Tarefa</th>
+                <th scope="col">Status</th>
+                <th scope="col">Excluir</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">1</th>
+                <td class="w-75">Nome da Tarefa</td>
+                <td><input type="checkbox"> Finalizada</td>
+                <td><button class="btn btn-danger btn-sm">Excluir</button></td>
+            </tr>
+        </tbody>
+    </table>
+	
+	
+Agora abra o arquivo app.module.ts e dentro do vetor imports, adicione FormsModule, confira se o import será realizado, o código deve estar conforme abaixo
+
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { TodolistComponent } from './todolist/todolist.component';
+import { FormsModule } from '@angular/forms';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    TodolistComponent
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    FormsModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+
+
+Agora volte ao arquivo todolist.component.html e faça a alteração abaixo:
+	troque: <input type="text" class="form-control" id="task" placeholder="Digite a tarefa a ser realizada">
+	por...: <input type="text" class="form-control" id="task" placeholder="Digite a tarefa a ser realizada" ngModel name="task">
+
+	troque: <form class="col-md-6 offset-md-3">
+	por...: <form (ngSubmit)="onSubmit(taskForm)" #taskForm="ngForm" class="col-md-6 offset-md-3">
+
+
+Com isso a aplicação irá quebrar, pois o método onSubmit não existe ainda, abra o arquivo todolist.component.ts e vamos adicionar o método dentro da class, lembrando de fazer o import do NgForm:
+
+export class TodolistComponent {
+  
+  onSubmit(form: NgForm){
+    
+  }
+  
+}
+
+Desta forma o projeto funciona novamente, agora vamos adicionar um vetor para salvar os dados, antes do onSubmit:
+
+	taskArray = [{ taskName: 'Adicionar tarefas', isCompleted: false }];
+
+
+Agora altere o body da tabela do todolist.component.html:
+
+		<tbody>
+            <tr *ngFor="let task of taskArray">
+                <th scope="row">1</th>
+                <td class="w-75">{{task.taskName}}</td>
+                <td><input type="checkbox"> Finalizada</td>
+                <td><button class="btn btn-danger btn-sm">Excluir</button></td>
+            </tr>
+        </tbody>
+
+
+Volte ao ts e altere o método onSubmit:
+
+  onSubmit(form: NgForm){
+    console.log(form.controls);
+
+    this.taskArray.push({
+      taskName: form.controls['task'].value,
+      isCompleted: false
+    });
+  }
+  
+
+Execute o projeto e adicione algumas tarefas para testar
+
+
+Volte ao arquivo html e vamos criar o método de exclusão, faça no tr do body da tabela de tarefas as alterações abaixo:
+
+	<tr *ngFor="let task of taskArray; index as i">
+		<th scope="row">{{i+1}}</th>
+		<td>{{task.taskName}}</td>
+		<td><input type="checkbox"> Finalizada</td>
+		<td><button class="btn btn-danger btn-sm" (click)="onDelete(i)">Excluir</button></td>
+	</tr>
+
+
+Volte ao ts e adicione abaixo do método onSubmit o método onDelete:
+
+  onDelete(index: number){
+    this.taskArray.splice(index, 1);
+  }
+
+
+Agora volte ao html e adicione no input do task o atributo required e na linha do button de submit faça a alteração abaixo, desta forma não é mais possível enviar uma tarefa sem digitar seu nome antes:
+
+<button [disabled]="taskForm.invalid" type="submit" class="btn btn-primary">Adicionar Tarefa</button>
+
+
+Teste para ver o funcionamente
+
+
+Agora troque a linha da div abaixo do input text da task pela linha abaixo:
+
+	<small *ngIf="taskForm.invalid && taskForm.dirty" class="text-danger">Campo Obrigatório.</small>
+
+
+Para limpar o formulário após o envio, adicione no arquivo ts, ao final do onSubmit a linha abaixo:
+
+	form.reset();
+	
+	
+Para finalizar as funcionalidades básicas, altere a linha do checkbox, conforme o código abaixo, adicionando o evento de change:
+
+	<td><input (change)="onCheck(i)" type="checkbox"> Finalizada</td>
+
+
+Agora basta criar o método no arquivo ts, abaixo do método onDelete:
+
+  onCheck(index: number){
+    this.taskArray[index].isCompleted = !this.taskArray[index].isCompleted;
+  }
+
